@@ -853,32 +853,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==================== DATA LOADING ====================
-async function loadData() {
-  // 尝试加载数据文件
-  try {
-    const [patentResp, relatedResp] = await Promise.all([
-      fetch('data_zl200.js').catch(() => null),
-      fetch('data_xg200.js').catch(() => null)
-    ]);
-
-    if (patentResp && patentResp.ok) {
-      const text = await patentResp.text();
-      App.data.patent = eval('(' + text.replace(/^.*?=\s*/, '').replace(/;\s*$/, '') + ')');
-    }
-    if (relatedResp && relatedResp.ok) {
-      const text = await relatedResp.text();
-      App.data.related = eval('(' + text.replace(/^.*?=\s*/, '').replace(/;\s*$/, '') + ')');
-    }
-  } catch(e) {
-    console.log('Data loading:', e);
-  }
-
-  // 如果没有数据，显示示例
-  if (!App.data.patent && !App.data.related) {
-    showDemo();
-    return;
-  }
-
+function loadData() {
+  if (typeof zl200Data !== 'undefined') App.data.patent = zl200Data;
+  if (typeof xg200Data !== 'undefined') App.data.related = xg200Data;
+  if (!App.data.patent && !App.data.related) { showDemo(); return; }
   renderContent();
   updateStats();
   buildTOC();
