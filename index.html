@@ -9658,9 +9658,10 @@ function render() {
       if (p.tables && p.tables.length) {
         totalTbls += p.tables.length;
         p.tables.forEach(function(t) {
-          html += "<table><tr>" + t.headers.map(function(h) { return "<th>" + h + "</th>"; }).join("") + "</tr>";
-          t.rows.forEach(function(r) {
-            html += "<tr>" + r.map(function(c) { return "<td>" + c + "</td>"; }).join("") + "</tr>";
+          html += "<table><tr>" + (t.headers||[]).map(function(h) { return "<th>" + h + "</th>"; }).join("") + "</tr>";
+          (t.rows||[]).forEach(function(r) {
+            var cells = Array.isArray(r) ? r : [r];
+            html += "<tr>" + cells.map(function(c) { return "<td>" + c + "</td>"; }).join("") + "</tr>";
           });
           html += "</table>";
         });
