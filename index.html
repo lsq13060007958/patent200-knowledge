@@ -830,7 +830,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 <!-- ============ DATA ============ -->
 <script>// ====== DATA ======
-const zl200Data = {
+var zl200Data = {
   "subject": "专利法",
   "chapters": [
     {
@@ -5744,7 +5744,7 @@ const zl200Data = {
     }
   ]
 };
-const xg200Data = {
+var xg200Data = {
   "subject": "相关法",
   "chapters": [
     {
@@ -10460,8 +10460,19 @@ document.addEventListener('DOMContentLoaded', () => {
 // ====== END DATA ======
 
 function loadData() {
-  if (typeof zl200Data !== 'undefined') App.data.patent = zl200Data;
-  if (typeof xg200Data !== 'undefined') App.data.related = xg200Data;
+  console.log('loadData called');
+  console.log('typeof zl200Data:', typeof zl200Data);
+  console.log('typeof xg200Data:', typeof xg200Data);
+  if (typeof zl200Data !== 'undefined') {
+    App.data.patent = zl200Data;
+    console.log('patent data set, chapters:', zl200Data.chapters.length);
+  }
+  if (typeof xg200Data !== 'undefined') {
+    App.data.related = xg200Data;
+    console.log('related data set, chapters:', xg200Data.chapters.length);
+  }
+  console.log('App.data.patent:', !!App.data.patent);
+  console.log('App.data.related:', !!App.data.related);
   if (!App.data.patent && !App.data.related) { showDemo(); return; }
   renderContent();
   updateStats();
