@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>专利法200知识点</title>
+<style>
+/* ==================== DESIGN SYSTEM ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Dark Mode (default) */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a25;
+  --bg-card: rgba(255,255,255,0.03);
+  --bg-card-hover: rgba(255,255,255,0.06);
+  --bg-glass: rgba(18,18,26,0.75);
+  --bg-glass-heavy: rgba(10,10,15,0.85);
+
+  --text-primary: #f0f0f5;
+  --text-secondary: #8888a0;
+  --text-tertiary: #55556a;
+  --text-inverse: #0a0a0f;
+
+  --accent-blue: #5b8def;
+  --accent-blue-glow: rgba(91,141,239,0.15);
+  --accent-blue-soft: rgba(91,141,239,0.08);
+  --accent-red: #ef5b5b;
+  --accent-red-glow: rgba(239,91,91,0.15);
+  --accent-red-soft: rgba(239,91,91,0.08);
+  --accent-green: #5bef8d;
+  --accent-green-glow: rgba(91,239,141,0.15);
+  --accent-amber: #efbe5b;
+  --accent-purple: #8b5bef;
+
+  --border: rgba(255,255,255,0.06);
+  --border-active: rgba(91,141,239,0.3);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-glow-blue: 0 0 20px rgba(91,141,239,0.2);
+  --shadow-glow-red: 0 0 20px rgba(239,91,91,0.2);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --font-sans: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-height: 56px;
+  --header-height: 52px;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f5fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eeeef3;
+  --bg-card: rgba(0,0,0,0.02);
+  --bg-card-hover: rgba(0,0,0,0.04);
+  --bg-glass: rgba(255,255,255,0.8);
+  --bg-glass-heavy: rgba(245,245,250,0.9);
+
+  --text-primary: #1a1a25;
+  --text-secondary: #666680;
+  --text-tertiary: #9999aa;
+  --text-inverse: #f0f0f5;
+
+  --border: rgba(0,0,0,0.08);
+  --border-active: rgba(91,141,239,0.4);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ==================== RESET ==================== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+}
+a { color: var(--accent-blue); text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ==================== HEADER ==================== */
+.header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: calc(var(--header-height) + var(--safe-top));
+  padding-top: var(--safe-top);
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 16px; padding-right: 16px;
+}
+.header-title {
+  font-size: 17px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.3px;
+}
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.header-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card); color: var(--text-secondary);
+  transition: all 0.2s; font-size: 16px;
+}
+.header-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+/* ==================== SEARCH ==================== */
+.search-container {
+  position: fixed;
+  top: calc(var(--header-height) + var(--safe-top));
+  left: 0; right: 0;
+  padding: 8px 16px;
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 99;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+}
+.search-container.active {
+  transform: translateY(0); opacity: 1; pointer-events: all;
+}
+.search-box {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 0 16px; height: 42px;
+  transition: border-color 0.2s;
+}
+.search-box:focus-within { border-color: var(--accent-blue); }
+.search-box input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text-primary); font-size: 15px;
+  font-family: var(--font-sans);
+}
+.search-box input::placeholder { color: var(--text-tertiary); }
+.search-icon { color: var(--text-tertiary); font-size: 15px; }
+.search-clear {
+  color: var(--text-tertiary); font-size: 14px;
+  padding: 4px; border-radius: 50%;
+  display: none;
+}
+.search-clear.visible { display: block; }
+
+/* ==================== STATS BAR ==================== */
+.stats-bar {
+  position: fixed;
+  top: calc(var(--header-height) + var(--safe-top));
+  left: 0; right: 0;
+  padding: 10px 16px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 98;
+  display: flex; gap: 12px; overflow-x: auto;
+  scrollbar-width: none;
+  transition: top 0.3s;
+}
+.stats-bar.shifted { top: calc(var(--header-height) + var(--safe-top) + 58px); }
+.stats-bar::-webkit-scrollbar { display: none; }
+.stat-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: var(--radius-full);
+  background: var(--bg-card); border: 1px solid var(--border);
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+  color: var(--text-secondary);
+}
+.stat-chip .num { color: var(--text-primary); font-weight: 700; font-size: 14px; }
+.stat-chip.blue .num { color: var(--accent-blue); }
+.stat-chip.red .num { color: var(--accent-red); }
+.stat-chip.green .num { color: var(--accent-green); }
+
+/* ==================== MAIN CONTENT ==================== */
+.main {
+  padding-top: calc(var(--header-height) + var(--safe-top) + 54px);
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+  min-height: 100dvh;
+}
+.main.search-open {
+  padding-top: calc(var(--header-height) + var(--safe-top) + 112px);
+}
+
+/* ==================== CHAPTER SECTION ==================== */
+.chapter {
+  margin: 0 0 8px;
+}
+.chapter-header {
+  position: sticky; top: calc(var(--header-height) + var(--safe-top) + 54px);
+  padding: 14px 16px 10px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chapter-header:hover { background: var(--bg-card-hover); }
+.chapter-header.search-shifted {
+  top: calc(var(--header-height) + var(--safe-top) + 112px);
+}
+.chapter-title {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.chapter-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--accent-blue-soft);
+  color: var(--accent-blue);
+  font-size: 11px; font-weight: 700;
+}
+.chapter-toggle {
+  color: var(--text-tertiary); font-size: 12px;
+  transition: transform 0.3s;
+}
+.chapter.collapsed .chapter-toggle { transform: rotate(-90deg); }
+.chapter-body {
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.chapter.collapsed .chapter-body { max-height: 0 !important; }
+
+/* ==================== KNOWLEDGE CARD ==================== */
+.k-card {
+  margin: 6px 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.k-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.k-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-md);
+}
+.k-card.highlight-blue::before { background: var(--accent-blue); }
+.k-card.highlight-red::before { background: var(--accent-red); }
+
+.k-card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 8px; gap: 10px;
+}
+.k-card-id {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 28px; padding: 0 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-size: 12px; font-weight: 700;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.k-card-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  flex: 1;
+}
+.k-card-actions {
+  display: flex; gap: 4px; flex-shrink: 0;
+}
+.k-action-btn {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-tertiary); font-size: 14px;
+  transition: all 0.2s;
+}
+.k-action-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.k-action-btn.bookmarked { color: var(--accent-amber); }
+
+.k-card-body {
+  font-size: 14px; line-height: 1.85;
+  color: var(--text-secondary);
+}
+.k-card-body .key-blue {
+  color: var(--accent-blue);
+  background: var(--accent-blue-soft);
+  padding: 1px 6px; border-radius: 4px;
+  font-weight: 500;
+}
+.k-card-body .key-red {
+  color: var(--accent-red);
+  background: var(--accent-red-soft);
+  padding: 1px 6px; border-radius: 4px;
+  font-weight: 500;
+}
+.k-card-body .sub-point {
+  display: block;
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.k-card-body .sub-point::before {
+  content: '';
+  position: absolute; left: 4px; top: 12px;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--text-tertiary);
+}
+.k-card-body .law-ref {
+  display: inline-block;
+  padding: 1px 6px; border-radius: 4px;
+  background: var(--bg-tertiary);
+  font-size: 12px; font-family: var(--font-mono);
+  color: var(--accent-purple); font-weight: 500;
+}
+
+/* ==================== TABLE STYLING ==================== */
+.k-table {
+  width: 100%; margin: 10px 0;
+  border-collapse: separate; border-spacing: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.k-table th {
+  background: var(--bg-tertiary);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+.k-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.k-table tr:last-child td { border-bottom: none; }
+.k-table tr:hover td { background: var(--bg-card-hover); }
+
+/* ==================== BOTTOM NAV ==================== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-around;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 6px 16px;
+  color: var(--text-tertiary);
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-item.active { color: var(--accent-blue); }
+.nav-item .nav-icon { font-size: 20px; line-height: 1; }
+.nav-item .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+.nav-item.active::after {
+  content: '';
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 2px; border-radius: 2px;
+  background: var(--accent-blue);
+}
+
+/* ==================== PANELS ==================== */
+.panel-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.panel-overlay.active { opacity: 1; pointer-events: all; }
+
+.panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  max-height: 85dvh;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.panel.active { transform: translateY(0); }
+.panel-handle {
+  display: flex; justify-content: center; padding: 10px 0 6px;
+}
+.panel-handle::after {
+  content: ''; width: 36px; height: 4px;
+  border-radius: 4px; background: var(--border);
+}
+.panel-header {
+  padding: 0 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title { font-size: 17px; font-weight: 700; }
+.panel-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); font-size: 14px;
+}
+.panel-body {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  padding-bottom: calc(20px + var(--safe-bottom));
+}
+
+/* TOC Panel */
+.toc-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toc-item:hover { background: var(--bg-card-hover); }
+.toc-item .toc-num {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--accent-blue-soft);
+  color: var(--accent-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.toc-item .toc-text {
+  font-size: 14px; font-weight: 500; color: var(--text-primary);
+  flex: 1;
+}
+.toc-item .toc-count {
+  font-size: 12px; color: var(--text-tertiary);
+}
+
+/* Bookmark Panel */
+.bookmark-item {
+  padding: 12px 14px; margin-bottom: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bookmark-item:hover { border-color: var(--border-active); }
+.bookmark-item .bm-title {
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.bookmark-item .bm-preview {
+  font-size: 13px; color: var(--text-tertiary);
+  overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bookmark-item .bm-meta {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 6px; font-size: 11px; color: var(--text-tertiary);
+}
+
+/* Settings */
+.setting-group {
+  margin-bottom: 20px;
+}
+.setting-group-title {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.setting-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.setting-item:last-child { border-bottom: none; }
+.setting-label {
+  font-size: 15px; font-weight: 500; color: var(--text-primary);
+}
+.setting-desc {
+  font-size: 12px; color: var(--text-tertiary); margin-top: 2px;
+}
+
+/* Toggle Switch */
+.toggle {
+  width: 48px; height: 28px; border-radius: 14px;
+  background: var(--bg-tertiary);
+  position: relative; cursor: pointer;
+  transition: background 0.3s;
+  border: 1px solid var(--border);
+}
+.toggle.active { background: var(--accent-blue); border-color: var(--accent-blue); }
+.toggle::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: white;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.active::after { transform: translateX(20px); }
+
+/* Font size control */
+.font-size-control {
+  display: flex; align-items: center; gap: 12px;
+}
+.font-size-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-primary); font-size: 16px; font-weight: 700;
+  border: 1px solid var(--border);
+}
+.font-size-btn:hover { border-color: var(--accent-blue); }
+.font-size-value {
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  min-width: 40px; text-align: center;
+}
+
+/* ==================== PROGRESS BAR ==================== */
+.progress-bar {
+  height: 3px; background: var(--bg-tertiary);
+  border-radius: 2px; overflow: hidden;
+  margin: 0 16px 8px;
+}
+.progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  transition: width 0.5s ease;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.empty-desc { font-size: 13px; color: var(--text-tertiary); }
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.k-card { animation: fadeInUp 0.3s ease both; }
+.k-card:nth-child(2) { animation-delay: 0.05s; }
+.k-card:nth-child(3) { animation-delay: 0.1s; }
+.k-card:nth-child(4) { animation-delay: 0.15s; }
+
+/* ==================== TOAST ==================== */
+.toast {
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 13px; font-weight: 500;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s;
+  z-index: 300;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* ==================== SCROLL TO TOP ==================== */
+.scroll-top {
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+  right: 16px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent-blue);
+  color: white; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-glow-blue);
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s;
+  z-index: 50;
+}
+.scroll-top.show { opacity: 1; pointer-events: all; }
+
+/* ==================== FILTER CHIPS ==================== */
+.filter-bar {
+  display: flex; gap: 8px; padding: 8px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 6px 14px; border-radius: var(--radius-full);
+  background: var(--bg-card); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  white-space: nowrap; transition: all 0.2s;
+  cursor: pointer;
+}
+.filter-chip:hover { border-color: var(--border-active); }
+.filter-chip.active {
+  background: var(--accent-blue-soft);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (min-width: 768px) {
+  .main { max-width: 640px; margin: 0 auto; }
+  .k-card { margin: 8px 0; }
+  .chapter-header { padding-left: 0; padding-right: 0; }
+  .stats-bar { max-width: 640px; margin: 0 auto; left: 50%; transform: translateX(-50%); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-title" id="headerTitle">专利法200</div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="toggleSearch()" title="搜索">🔍</button>
+    <button class="header-btn" onclick="openPanel('toc')" title="目录">📑</button>
+    <button class="header-btn" onclick="openPanel('settings')" title="设置">⚙️</button>
+  </div>
+</header>
+
+<!-- ============ SEARCH ============ -->
+<div class="search-container" id="searchContainer">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜索知识点、关键词..." oninput="onSearch(this.value)">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+
+<!-- ============ STATS BAR ============ -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-chip blue">
+    <span>📘</span>
+    <span>知识点</span>
+    <span class="num" id="statPoints">0</span>
+  </div>
+  <div class="stat-chip red">
+    <span>🔴</span>
+    <span>重点标记</span>
+    <span class="num" id="statHighlights">0</span>
+  </div>
+  <div class="stat-chip green">
+    <span>📊</span>
+    <span>表格</span>
+    <span class="num" id="statTables">0</span>
+  </div>
+  <div class="stat-chip">
+    <span>🔖</span>
+    <span>书签</span>
+    <span class="num" id="statBookmarks">0</span>
+  </div>
+</div>
+
+<!-- ============ MAIN CONTENT ============ -->
+<main class="main" id="mainContent">
+  <div id="contentArea">
+    <!-- 动态生成 -->
+  </div>
+</main>
+
+<!-- ============ SCROLL TO TOP ============ -->
+<button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-tab="patent" onclick="switchTab('patent')">
+    <span class="nav-icon">📘</span>
+    <span class="nav-label">专利法</span>
+  </button>
+  <button class="nav-item" data-tab="related" onclick="switchTab('related')">
+    <span class="nav-icon">📗</span>
+    <span class="nav-label">相关法</span>
+  </button>
+  <button class="nav-item" data-tab="bookmarks" onclick="openPanel('bookmarks')">
+    <span class="nav-icon">🔖</span>
+    <span class="nav-label">书签</span>
+  </button>
+  <button class="nav-item" data-tab="progress" onclick="openPanel('progress')">
+    <span class="nav-icon">📈</span>
+    <span class="nav-label">进度</span>
+  </button>
+</nav>
+
+<!-- ============ PANELS ============ -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- TOC Panel -->
+<div class="panel" id="tocPanel">
+  <div class="panel-handle"></div>
+  <div class="panel-header">
+    <span class="panel-title">📑 目录导航</span>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="tocBody"></div>
+</div>
+
+<!-- Bookmarks Panel -->
+<div class="panel" id="bookmarksPanel">
+  <div class="panel-handle"></div>
+  <div class="panel-header">
+    <span class="panel-title">🔖 我的书签</span>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="bookmarksBody"></div>
+</div>
+
+<!-- Settings Panel -->
+<div class="panel" id="settingsPanel">
+  <div class="panel-handle"></div>
+  <div class="panel-header">
+    <span class="panel-title">⚙️ 设置</span>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="setting-group">
+      <div class="setting-group-title">显示</div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">深色模式</div>
+          <div class="setting-desc">护眼暗色主题</div>
+        </div>
+        <div class="toggle active" id="darkToggle" onclick="toggleDark()"></div>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">字体大小</div>
+          <div class="setting-desc">调整正文字体大小</div>
+        </div>
+        <div class="font-size-control">
+          <button class="font-size-btn" onclick="changeFontSize(-1)">A-</button>
+          <span class="font-size-value" id="fontSizeValue">14px</span>
+          <button class="font-size-btn" onclick="changeFontSize(1)">A+</button>
+        </div>
+      </div>
+    </div>
+    <div class="setting-group">
+      <div class="setting-group-title">数据</div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">清除书签</div>
+          <div class="setting-desc">删除所有已保存的书签</div>
+        </div>
+        <button class="filter-chip" onclick="clearBookmarks()" style="color:var(--accent-red)">清除</button>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">重置进度</div>
+          <div class="setting-desc">清除阅读进度记录</div>
+        </div>
+        <button class="filter-chip" onclick="clearProgress()" style="color:var(--accent-red)">重置</button>
+      </div>
+    </div>
+    <div class="setting-group">
+      <div class="setting-group-title">关于</div>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label">专利法200知识点</div>
+          <div class="setting-desc">韩龙专利课堂 · 2026年专利代理师资格考试</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress Panel -->
+<div class="panel" id="progressPanel">
+  <div class="panel-handle"></div>
+  <div class="panel-header">
+    <span class="panel-title">📈 阅读进度</span>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="progressBody"></div>
+</div>
+
+<!-- ============ DATA ============ -->
+<script>
+// ==================== APP STATE ====================
+const App = {
+  currentTab: 'patent',
+  data: { patent: null, related: null },
+  bookmarks: JSON.parse(localStorage.getItem('patent200_bookmarks') || '{}'),
+  readProgress: JSON.parse(localStorage.getItem('patent200_progress') || '{}'),
+  fontSize: parseInt(localStorage.getItem('patent200_fontsize') || '14'),
+  darkMode: localStorage.getItem('patent200_dark') !== 'false',
+  searchQuery: '',
+  searchActive: false,
+};
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  if (App.darkMode) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('darkToggle').classList.remove('active');
+  }
+  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
+  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
+  loadData();
+});
+
+// ==================== DATA LOADING ====================
+async function loadData() {
+  // 尝试加载数据文件
+  try {
+    const [patentResp, relatedResp] = await Promise.all([
+      fetch('data_zl200.js').catch(() => null),
+      fetch('data_xg200.js').catch(() => null)
+    ]);
+
+    if (patentResp && patentResp.ok) {
+      const text = await patentResp.text();
+      App.data.patent = eval('(' + text.replace(/^.*?=\s*/, '').replace(/;\s*$/, '') + ')');
+    }
+    if (relatedResp && relatedResp.ok) {
+      const text = await relatedResp.text();
+      App.data.related = eval('(' + text.replace(/^.*?=\s*/, '').replace(/;\s*$/, '') + ')');
+    }
+  } catch(e) {
+    console.log('Data loading:', e);
+  }
+
+  // 如果没有数据，显示示例
+  if (!App.data.patent && !App.data.related) {
+    showDemo();
+    return;
+  }
+
+  renderContent();
+  updateStats();
+  buildTOC();
+}
+
+// ==================== DEMO DATA ====================
+function showDemo() {
+  App.data.patent = {
+    subject: '专利法',
+    chapters: [
+      {
+        title: '一、专利制度概述',
+        points: [
+          { id: '1', title: '专利权的概念', content: '专利权是国家专利行政部门根据法律规定，授予发明创造申请人对其发明创造在一定期限内享有的<span class="key-blue">独占实施权</span>。专利权是一种<span class="key-red">排他性</span>的财产权。', sub_points: ['①专利权具有地域性，仅在授权国有效', '②专利权具有时间性，发明专利20年，实用新型和外观设计10年', '③专利权需要以公开技术方案为代价'] },
+          { id: '2', title: '专利制度的基本原则', content: '专利制度遵循以下基本原则：', sub_points: ['①<span class="key-blue">先申请原则</span>：两个以上申请人分别就同样发明创造申请专利的，专利权授予最先申请的人', '②单一性原则：一件专利申请应当限于一项发明创造', '③优先权原则：申请人在外国第一次提出专利申请之日起12个月内，又在中国就相同主题提出专利申请的，可以享有优先权'] },
+          { id: '3', title: '专利法的客体', content: '专利法保护的客体包括：<span class="key-blue">发明</span>、<span class="key-blue">实用新型</span>和<span class="key-blue">外观设计</span>。其中发明和实用新型需要具备新颖性、创造性和实用性三要件。', tables: [{ headers: ['类型', '保护期限', '审批方式', '创造性要求'], rows: [['发明专利', '20年', '实质审查', '突出的实质性特点和显著的进步'], ['实用新型', '10年', '初步审查', '实质性特点和进步'], ['外观设计', '15年', '初步审查', '与现有设计有明显区别']] }] }
+        ]
+      },
+      {
+        title: '二、专利代理制度',
+        points: [
+          { id: '4', title: '不得报名参加考试的情形', content: '以下人员不得报名参加专利代理师资格考试：', sub_points: ['①因<span class="key-red">故意犯罪</span>受过刑罚，自刑罚执行完毕之日起未满3年', '②受吊销专利代理师资格证的处罚，自处罚决定之日起未满3年'] },
+          { id: '5', title: '专利代理机构的成立条件', content: '专利代理机构名称中应含有"<span class="key-blue">专利代理</span>"或"<span class="key-blue">知识产权代理</span>"等字样。', tables: [{ headers: ['机构类型', '人员要求', '数量要求'], rows: [['合伙企业', '2年以上执业经历的合伙人', '2名以上'], ['有限责任公司', '2年以上执业经历的股东', '5名以上以上'], ['律师事务所', '具有专利代理师资格证的律师', '1名以上']] }] }
+        ]
+      }
+    ]
+  };
+  App.data.related = {
+    subject: '相关法',
+    chapters: [
+      {
+        title: '一、民法典',
+        points: [
+          { id: '1', title: '自然人的民事权利能力', content: '自然人从<span class="key-blue">出生时</span>起到<span class="key-blue">死亡时</span>止，具有民事权利能力，依法享有民事权利，承担民事义务。', sub_points: ['①自然人的出生时间和死亡时间，以出生证明、死亡证明记载的时间为准', '②没有出生证明、死亡证明的，以户籍登记或者其他有效身份登记记载的时间为准'] },
+          { id: '2', title: '宣告失踪', content: '自然人下落不明满<span class="key-red">2年</span>的，利害关系人可以向人民法院申请宣告该自然人为失踪人。', sub_points: ['①失踪人的财产由财产代管人管理', '②财产代管人应当妥善管理失踪人的财产'] }
+        ]
+      }
+    ]
+  };
+  renderContent();
+  updateStats();
+  buildTOC();
+}
+
+// ==================== RENDER ====================
+function renderContent() {
+  const data = App.data[App.currentTab];
+  if (!data) {
+    document.getElementById('contentArea').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">暂无数据</div>
+        <div class="empty-desc">请稍后再试</div>
+      </div>`;
+    return;
+  }
+
+  const container = document.getElementById('contentArea');
+  let html = '';
+
+  data.chapters.forEach((chapter, ci) => {
+    const chapterId = `ch_${ci}`;
+    const isCollapsed = localStorage.getItem(`patent200_col_${App.currentTab}_${ci}`) === 'true';
+
+    html += `<div class="chapter ${isCollapsed ? 'collapsed' : ''}" id="${chapterId}">
+      <div class="chapter-header ${App.searchActive ? 'search-shifted' : ''}" onclick="toggleChapter('${chapterId}', ${ci})">
+        <div class="chapter-title">
+          <span class="chapter-badge">${chapter.points.length}</span>
+          ${chapter.title}
+        </div>
+        <span class="chapter-toggle">▼</span>
+      </div>
+      <div class="chapter-body">`;
+
+    chapter.points.forEach((point, pi) => {
+      const cardId = `${App.currentTab}_${ci}_${pi}`;
+      const isBookmarked = App.bookmarks[cardId];
+      const hasBlue = (point.content || '').includes('key-blue') || (point.sub_points || []).some(s => s.includes('key-blue'));
+      const hasRed = (point.content || '').includes('key-red') || (point.sub_points || []).some(s => s.includes('key-red'));
+
+      // Search filter
+      if (App.searchQuery) {
+        const q = App.searchQuery.toLowerCase();
+        const searchText = `${point.id} ${point.title} ${point.content} ${(point.sub_points||[]).join(' ')}`.toLowerCase();
+        if (!searchText.includes(q)) return;
+      }
+
+      html += `<div class="k-card ${hasBlue ? 'highlight-blue' : ''} ${hasRed ? 'highlight-red' : ''}" id="card_${cardId}">
+        <div class="k-card-header">
+          <span class="k-card-id">${point.id}</span>
+          <span class="k-card-title">${point.title}</span>
+          <div class="k-card-actions">
+            <button class="k-action-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${cardId}', '${point.title}')" title="书签">
+              ${isBookmarked ? '★' : '☆'}
+            </button>
+          </div>
+        </div>
+        <div class="k-card-body" style="font-size:${App.fontSize}px">
+          ${point.content || ''}`;
+
+      if (point.sub_points && point.sub_points.length) {
+        point.sub_points.forEach(sp => {
+          html += `<span class="sub-point">${sp}</span>`;
+        });
+      }
+
+      if (point.tables && point.tables.length) {
+        point.tables.forEach(tbl => {
+          html += `<table class="k-table"><thead><tr>`;
+          tbl.headers.forEach(h => html += `<th>${h}</th>`);
+          html += `</tr></thead><tbody>`;
+          tbl.rows.forEach(row => {
+            html += `<tr>`;
+            row.forEach(cell => html += `<td>${cell}</td>`);
+            html += `</tr>`;
+          });
+          html += `</tbody></table>`;
+        });
+      }
+
+      html += `</div></div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (!html && App.searchQuery) {
+    html = `<div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">未找到匹配结果</div>
+      <div class="empty-desc">试试其他关键词</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ==================== STATS ====================
+function updateStats() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let points = 0, highlights = 0, tables = 0;
+  data.chapters.forEach(ch => {
+    points += ch.points.length;
+    ch.points.forEach(p => {
+      const text = `${p.content || ''} ${(p.sub_points||[]).join(' ')}`;
+      if (text.includes('key-blue') || text.includes('key-red')) highlights++;
+      if (p.tables && p.tables.length) tables += p.tables.length;
+    });
+  });
+
+  document.getElementById('statPoints').textContent = points;
+  document.getElementById('statHighlights').textContent = highlights;
+  document.getElementById('statTables').textContent = tables;
+  document.getElementById('statBookmarks').textContent = Object.keys(App.bookmarks).filter(k => k.startsWith(App.currentTab)).length;
+}
+
+// ==================== TOC ====================
+function buildTOC() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let html = '';
+  data.chapters.forEach((ch, i) => {
+    html += `<div class="toc-item" onclick="scrollToChapter(${i}); closePanel();">
+      <span class="toc-num">${i + 1}</span>
+      <span class="toc-text">${ch.title}</span>
+      <span class="toc-count">${ch.points.length}个</span>
+    </div>`;
+  });
+  document.getElementById('tocBody').innerHTML = html;
+}
+
+// ==================== TAB SWITCHING ====================
+function switchTab(tab) {
+  App.currentTab = tab;
+  App.searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  const titles = { patent: '专利法200', related: '相关法200', bookmarks: '书签', progress: '进度' };
+  document.getElementById('headerTitle').textContent = titles[tab] || '';
+
+  renderContent();
+  updateStats();
+  buildTOC();
+  scrollToTop();
+}
+
+// ==================== SEARCH ====================
+function toggleSearch() {
+  App.searchActive = !App.searchActive;
+  const container = document.getElementById('searchContainer');
+  const main = document.getElementById('mainContent');
+  const statsBar = document.getElementById('statsBar');
+
+  if (App.searchActive) {
+    container.classList.add('active');
+    main.classList.add('search-open');
+    statsBar.classList.add('shifted');
+    document.getElementById('searchInput').focus();
+  } else {
+    container.classList.remove('active');
+    main.classList.remove('search-open');
+    statsBar.classList.remove('shifted');
+    clearSearch();
+  }
+}
+
+function onSearch(value) {
+  App.searchQuery = value.trim();
+  document.getElementById('searchClear').classList.toggle('visible', !!value);
+  renderContent();
+}
+
+function clearSearch() {
+  App.searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  renderContent();
+}
+
+// ==================== CHAPTERS ====================
+function toggleChapter(id, index) {
+  const el = document.getElementById(id);
+  el.classList.toggle('collapsed');
+  localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, el.classList.contains('collapsed'));
+}
+
+function scrollToChapter(index) {
+  const el = document.getElementById(`ch_${index}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el.classList.contains('collapsed')) {
+      el.classList.remove('collapsed');
+      localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, 'false');
+    }
+  }
+}
+
+// ==================== BOOKMARKS ====================
+function toggleBookmark(cardId, title) {
+  if (App.bookmarks[cardId]) {
+    delete App.bookmarks[cardId];
+    showToast('已取消书签');
+  } else {
+    App.bookmarks[cardId] = { title, tab: App.currentTab, time: Date.now() };
+    showToast('已添加书签 ★');
+  }
+  localStorage.setItem('patent200_bookmarks', JSON.stringify(App.bookmarks));
+  renderContent();
+  updateStats();
+}
+
+function clearBookmarks() {
+  if (confirm('确定清除所有书签？')) {
+    App.bookmarks = {};
+    localStorage.setItem('patent200_bookmarks', '{}');
+    renderContent();
+    updateStats();
+    showToast('书签已清除');
+  }
+}
+
+function renderBookmarks() {
+  const entries = Object.entries(App.bookmarks).sort((a, b) => b[1].time - a[1].time);
+  if (!entries.length) {
+    document.getElementById('bookmarksBody').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔖</div>
+        <div class="empty-title">暂无书签</div>
+        <div class="empty-desc">点击知识点卡片的 ☆ 添加书签</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([id, bm]) => {
+    const date = new Date(bm.time).toLocaleDateString('zh-CN');
+    html += `<div class="bookmark-item" onclick="jumpToBookmark('${bm.tab}', '${id}')">
+      <div class="bm-title">${bm.title}</div>
+      <div class="bm-meta">
+        <span>${bm.tab === 'patent' ? '📘 专利法' : '📗 相关法'}</span>
+        <span>${date}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('bookmarksBody').innerHTML = html;
+}
+
+function jumpToBookmark(tab, cardId) {
+  closePanel();
+  if (App.currentTab !== tab) switchTab(tab);
+  setTimeout(() => {
+    const el = document.getElementById(`card_${cardId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.boxShadow = '0 0 0 2px var(--accent-blue)';
+      setTimeout(() => el.style.boxShadow = '', 2000);
+    }
+  }, 300);
+}
+
+// ==================== PROGRESS ====================
+function renderProgress() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let total = 0, read = 0;
+  data.chapters.forEach((ch, ci) => {
+    ch.points.forEach((p, pi) => {
+      total++;
+      const key = `${App.currentTab}_${ci}_${pi}`;
+      if (App.readProgress[key]) read++;
+    });
+  });
+
+  const pct = total ? Math.round(read / total * 100) : 0;
+  document.getElementById('progressBody').innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;font-weight:900;color:var(--accent-blue);">${pct}%</div>
+      <div style="color:var(--text-secondary);margin:8px 0;">已阅读 ${read} / ${total} 个知识点</div>
+      <div class="progress-bar" style="margin:16px auto;max-width:200px;">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function clearProgress() {
+  if (confirm('确定重置阅读进度？')) {
+    App.readProgress = {};
+    localStorage.setItem('patent200_progress', '{}');
+    showToast('进度已重置');
+  }
+}
+
+// ==================== PANELS ====================
+function openPanel(name) {
+  document.getElementById('panelOverlay').classList.add('active');
+  document.getElementById(`${name}Panel`).classList.add('active');
+
+  if (name === 'bookmarks') renderBookmarks();
+  if (name === 'progress') renderProgress();
+}
+
+function closePanel() {
+  document.getElementById('panelOverlay').classList.remove('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+}
+
+// ==================== SETTINGS ====================
+function toggleDark() {
+  App.darkMode = !App.darkMode;
+  document.documentElement.setAttribute('data-theme', App.darkMode ? 'dark' : 'light');
+  document.getElementById('darkToggle').classList.toggle('active', App.darkMode);
+  localStorage.setItem('patent200_dark', App.darkMode);
+}
+
+function changeFontSize(delta) {
+  App.fontSize = Math.max(12, Math.min(20, App.fontSize + delta));
+  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
+  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
+  localStorage.setItem('patent200_fontsize', App.fontSize);
+  // Update all card bodies
+  document.querySelectorAll('.k-card-body').forEach(el => el.style.fontSize = App.fontSize + 'px');
+}
+
+// ==================== UTILS ====================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Scroll to top button visibility
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 300);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    if (!App.searchActive) toggleSearch();
+  }
+  if (e.key === 'Escape') {
+    if (App.searchActive) toggleSearch();
+    closePanel();
+  }
+});
+</script>
+</body>
+</html>
