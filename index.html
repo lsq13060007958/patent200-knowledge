@@ -826,439 +826,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 </div>
 
 <!-- ============ DATA ============ -->
-<script>
-// ==================== APP STATE ====================
-const App = {
-  currentTab: 'patent',
-  data: { patent: null, related: null },
-  bookmarks: JSON.parse(localStorage.getItem('patent200_bookmarks') || '{}'),
-  readProgress: JSON.parse(localStorage.getItem('patent200_progress') || '{}'),
-  fontSize: parseInt(localStorage.getItem('patent200_fontsize') || '14'),
-  darkMode: localStorage.getItem('patent200_dark') !== 'false',
-  searchQuery: '',
-  searchActive: false,
-};
-
-// ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', () => {
-  if (App.darkMode) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  } else {
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.getElementById('darkToggle').classList.remove('active');
-  }
-  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
-  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
-  loadData();
-});
-
-// ==================== DATA LOADING ====================
-function loadData() {
-  if (typeof zl200Data !== 'undefined') App.data.patent = zl200Data;
-  if (typeof xg200Data !== 'undefined') App.data.related = xg200Data;
-  if (!App.data.patent && !App.data.related) { showDemo(); return; }
-  renderContent();
-  updateStats();
-  buildTOC();
-}
-
-// ==================== DEMO DATA ====================
-function showDemo() {
-  App.data.patent = {
-    subject: '专利法',
-    chapters: [
-      {
-        title: '一、专利制度概述',
-        points: [
-          { id: '1', title: '专利权的概念', content: '专利权是国家专利行政部门根据法律规定，授予发明创造申请人对其发明创造在一定期限内享有的<span class="key-blue">独占实施权</span>。专利权是一种<span class="key-red">排他性</span>的财产权。', sub_points: ['①专利权具有地域性，仅在授权国有效', '②专利权具有时间性，发明专利20年，实用新型和外观设计10年', '③专利权需要以公开技术方案为代价'] },
-          { id: '2', title: '专利制度的基本原则', content: '专利制度遵循以下基本原则：', sub_points: ['①<span class="key-blue">先申请原则</span>：两个以上申请人分别就同样发明创造申请专利的，专利权授予最先申请的人', '②单一性原则：一件专利申请应当限于一项发明创造', '③优先权原则：申请人在外国第一次提出专利申请之日起12个月内，又在中国就相同主题提出专利申请的，可以享有优先权'] },
-          { id: '3', title: '专利法的客体', content: '专利法保护的客体包括：<span class="key-blue">发明</span>、<span class="key-blue">实用新型</span>和<span class="key-blue">外观设计</span>。其中发明和实用新型需要具备新颖性、创造性和实用性三要件。', tables: [{ headers: ['类型', '保护期限', '审批方式', '创造性要求'], rows: [['发明专利', '20年', '实质审查', '突出的实质性特点和显著的进步'], ['实用新型', '10年', '初步审查', '实质性特点和进步'], ['外观设计', '15年', '初步审查', '与现有设计有明显区别']] }] }
-        ]
-      },
-      {
-        title: '二、专利代理制度',
-        points: [
-          { id: '4', title: '不得报名参加考试的情形', content: '以下人员不得报名参加专利代理师资格考试：', sub_points: ['①因<span class="key-red">故意犯罪</span>受过刑罚，自刑罚执行完毕之日起未满3年', '②受吊销专利代理师资格证的处罚，自处罚决定之日起未满3年'] },
-          { id: '5', title: '专利代理机构的成立条件', content: '专利代理机构名称中应含有"<span class="key-blue">专利代理</span>"或"<span class="key-blue">知识产权代理</span>"等字样。', tables: [{ headers: ['机构类型', '人员要求', '数量要求'], rows: [['合伙企业', '2年以上执业经历的合伙人', '2名以上'], ['有限责任公司', '2年以上执业经历的股东', '5名以上以上'], ['律师事务所', '具有专利代理师资格证的律师', '1名以上']] }] }
-        ]
-      }
-    ]
-  };
-  App.data.related = {
-    subject: '相关法',
-    chapters: [
-      {
-        title: '一、民法典',
-        points: [
-          { id: '1', title: '自然人的民事权利能力', content: '自然人从<span class="key-blue">出生时</span>起到<span class="key-blue">死亡时</span>止，具有民事权利能力，依法享有民事权利，承担民事义务。', sub_points: ['①自然人的出生时间和死亡时间，以出生证明、死亡证明记载的时间为准', '②没有出生证明、死亡证明的，以户籍登记或者其他有效身份登记记载的时间为准'] },
-          { id: '2', title: '宣告失踪', content: '自然人下落不明满<span class="key-red">2年</span>的，利害关系人可以向人民法院申请宣告该自然人为失踪人。', sub_points: ['①失踪人的财产由财产代管人管理', '②财产代管人应当妥善管理失踪人的财产'] }
-        ]
-      }
-    ]
-  };
-  renderContent();
-  updateStats();
-  buildTOC();
-}
-
-// ==================== RENDER ====================
-function renderContent() {
-  const data = App.data[App.currentTab];
-  if (!data) {
-    document.getElementById('contentArea').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <div class="empty-title">暂无数据</div>
-        <div class="empty-desc">请稍后再试</div>
-      </div>`;
-    return;
-  }
-
-  const container = document.getElementById('contentArea');
-  let html = '';
-
-  data.chapters.forEach((chapter, ci) => {
-    const chapterId = `ch_${ci}`;
-    const isCollapsed = localStorage.getItem(`patent200_col_${App.currentTab}_${ci}`) === 'true';
-
-    html += `<div class="chapter ${isCollapsed ? 'collapsed' : ''}" id="${chapterId}">
-      <div class="chapter-header ${App.searchActive ? 'search-shifted' : ''}" onclick="toggleChapter('${chapterId}', ${ci})">
-        <div class="chapter-title">
-          <span class="chapter-badge">${chapter.points.length}</span>
-          ${chapter.title}
-        </div>
-        <span class="chapter-toggle">▼</span>
-      </div>
-      <div class="chapter-body">`;
-
-    chapter.points.forEach((point, pi) => {
-      const cardId = `${App.currentTab}_${ci}_${pi}`;
-      const isBookmarked = App.bookmarks[cardId];
-      const hasBlue = (point.content || '').includes('key-blue') || (point.sub_points || []).some(s => s.includes('key-blue'));
-      const hasRed = (point.content || '').includes('key-red') || (point.sub_points || []).some(s => s.includes('key-red'));
-
-      // Search filter
-      if (App.searchQuery) {
-        const q = App.searchQuery.toLowerCase();
-        const searchText = `${point.id} ${point.title} ${point.content} ${(point.sub_points||[]).join(' ')}`.toLowerCase();
-        if (!searchText.includes(q)) return;
-      }
-
-      html += `<div class="k-card ${hasBlue ? 'highlight-blue' : ''} ${hasRed ? 'highlight-red' : ''}" id="card_${cardId}">
-        <div class="k-card-header">
-          <span class="k-card-id">${point.id}</span>
-          <span class="k-card-title">${point.title}</span>
-          <div class="k-card-actions">
-            <button class="k-action-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${cardId}', '${point.title}')" title="书签">
-              ${isBookmarked ? '★' : '☆'}
-            </button>
-          </div>
-        </div>
-        <div class="k-card-body" style="font-size:${App.fontSize}px">
-          ${point.content || ''}`;
-
-      if (point.sub_points && point.sub_points.length) {
-        point.sub_points.forEach(sp => {
-          html += `<span class="sub-point">${sp}</span>`;
-        });
-      }
-
-      if (point.tables && point.tables.length) {
-        point.tables.forEach(tbl => {
-          html += `<table class="k-table"><thead><tr>`;
-          tbl.headers.forEach(h => html += `<th>${h}</th>`);
-          html += `</tr></thead><tbody>`;
-          tbl.rows.forEach(row => {
-            html += `<tr>`;
-            row.forEach(cell => html += `<td>${cell}</td>`);
-            html += `</tr>`;
-          });
-          html += `</tbody></table>`;
-        });
-      }
-
-      html += `</div></div>`;
-    });
-
-    html += `</div></div>`;
-  });
-
-  if (!html && App.searchQuery) {
-    html = `<div class="empty-state">
-      <div class="empty-icon">🔍</div>
-      <div class="empty-title">未找到匹配结果</div>
-      <div class="empty-desc">试试其他关键词</div>
-    </div>`;
-  }
-
-  container.innerHTML = html;
-}
-
-// ==================== STATS ====================
-function updateStats() {
-  const data = App.data[App.currentTab];
-  if (!data) return;
-
-  let points = 0, highlights = 0, tables = 0;
-  data.chapters.forEach(ch => {
-    points += ch.points.length;
-    ch.points.forEach(p => {
-      const text = `${p.content || ''} ${(p.sub_points||[]).join(' ')}`;
-      if (text.includes('key-blue') || text.includes('key-red')) highlights++;
-      if (p.tables && p.tables.length) tables += p.tables.length;
-    });
-  });
-
-  document.getElementById('statPoints').textContent = points;
-  document.getElementById('statHighlights').textContent = highlights;
-  document.getElementById('statTables').textContent = tables;
-  document.getElementById('statBookmarks').textContent = Object.keys(App.bookmarks).filter(k => k.startsWith(App.currentTab)).length;
-}
-
-// ==================== TOC ====================
-function buildTOC() {
-  const data = App.data[App.currentTab];
-  if (!data) return;
-
-  let html = '';
-  data.chapters.forEach((ch, i) => {
-    html += `<div class="toc-item" onclick="scrollToChapter(${i}); closePanel();">
-      <span class="toc-num">${i + 1}</span>
-      <span class="toc-text">${ch.title}</span>
-      <span class="toc-count">${ch.points.length}个</span>
-    </div>`;
-  });
-  document.getElementById('tocBody').innerHTML = html;
-}
-
-// ==================== TAB SWITCHING ====================
-function switchTab(tab) {
-  App.currentTab = tab;
-  App.searchQuery = '';
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchClear').classList.remove('visible');
-
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-
-  const titles = { patent: '专利法200', related: '相关法200', bookmarks: '书签', progress: '进度' };
-  document.getElementById('headerTitle').textContent = titles[tab] || '';
-
-  renderContent();
-  updateStats();
-  buildTOC();
-  scrollToTop();
-}
-
-// ==================== SEARCH ====================
-function toggleSearch() {
-  App.searchActive = !App.searchActive;
-  const container = document.getElementById('searchContainer');
-  const main = document.getElementById('mainContent');
-  const statsBar = document.getElementById('statsBar');
-
-  if (App.searchActive) {
-    container.classList.add('active');
-    main.classList.add('search-open');
-    statsBar.classList.add('shifted');
-    document.getElementById('searchInput').focus();
-  } else {
-    container.classList.remove('active');
-    main.classList.remove('search-open');
-    statsBar.classList.remove('shifted');
-    clearSearch();
-  }
-}
-
-function onSearch(value) {
-  App.searchQuery = value.trim();
-  document.getElementById('searchClear').classList.toggle('visible', !!value);
-  renderContent();
-}
-
-function clearSearch() {
-  App.searchQuery = '';
-  document.getElementById('searchInput').value = '';
-  document.getElementById('searchClear').classList.remove('visible');
-  renderContent();
-}
-
-// ==================== CHAPTERS ====================
-function toggleChapter(id, index) {
-  const el = document.getElementById(id);
-  el.classList.toggle('collapsed');
-  localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, el.classList.contains('collapsed'));
-}
-
-function scrollToChapter(index) {
-  const el = document.getElementById(`ch_${index}`);
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (el.classList.contains('collapsed')) {
-      el.classList.remove('collapsed');
-      localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, 'false');
-    }
-  }
-}
-
-// ==================== BOOKMARKS ====================
-function toggleBookmark(cardId, title) {
-  if (App.bookmarks[cardId]) {
-    delete App.bookmarks[cardId];
-    showToast('已取消书签');
-  } else {
-    App.bookmarks[cardId] = { title, tab: App.currentTab, time: Date.now() };
-    showToast('已添加书签 ★');
-  }
-  localStorage.setItem('patent200_bookmarks', JSON.stringify(App.bookmarks));
-  renderContent();
-  updateStats();
-}
-
-function clearBookmarks() {
-  if (confirm('确定清除所有书签？')) {
-    App.bookmarks = {};
-    localStorage.setItem('patent200_bookmarks', '{}');
-    renderContent();
-    updateStats();
-    showToast('书签已清除');
-  }
-}
-
-function renderBookmarks() {
-  const entries = Object.entries(App.bookmarks).sort((a, b) => b[1].time - a[1].time);
-  if (!entries.length) {
-    document.getElementById('bookmarksBody').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔖</div>
-        <div class="empty-title">暂无书签</div>
-        <div class="empty-desc">点击知识点卡片的 ☆ 添加书签</div>
-      </div>`;
-    return;
-  }
-
-  let html = '';
-  entries.forEach(([id, bm]) => {
-    const date = new Date(bm.time).toLocaleDateString('zh-CN');
-    html += `<div class="bookmark-item" onclick="jumpToBookmark('${bm.tab}', '${id}')">
-      <div class="bm-title">${bm.title}</div>
-      <div class="bm-meta">
-        <span>${bm.tab === 'patent' ? '📘 专利法' : '📗 相关法'}</span>
-        <span>${date}</span>
-      </div>
-    </div>`;
-  });
-  document.getElementById('bookmarksBody').innerHTML = html;
-}
-
-function jumpToBookmark(tab, cardId) {
-  closePanel();
-  if (App.currentTab !== tab) switchTab(tab);
-  setTimeout(() => {
-    const el = document.getElementById(`card_${cardId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.style.boxShadow = '0 0 0 2px var(--accent-blue)';
-      setTimeout(() => el.style.boxShadow = '', 2000);
-    }
-  }, 300);
-}
-
-// ==================== PROGRESS ====================
-function renderProgress() {
-  const data = App.data[App.currentTab];
-  if (!data) return;
-
-  let total = 0, read = 0;
-  data.chapters.forEach((ch, ci) => {
-    ch.points.forEach((p, pi) => {
-      total++;
-      const key = `${App.currentTab}_${ci}_${pi}`;
-      if (App.readProgress[key]) read++;
-    });
-  });
-
-  const pct = total ? Math.round(read / total * 100) : 0;
-  document.getElementById('progressBody').innerHTML = `
-    <div style="text-align:center;padding:20px 0;">
-      <div style="font-size:48px;font-weight:900;color:var(--accent-blue);">${pct}%</div>
-      <div style="color:var(--text-secondary);margin:8px 0;">已阅读 ${read} / ${total} 个知识点</div>
-      <div class="progress-bar" style="margin:16px auto;max-width:200px;">
-        <div class="progress-fill" style="width:${pct}%"></div>
-      </div>
-    </div>
-  `;
-}
-
-function clearProgress() {
-  if (confirm('确定重置阅读进度？')) {
-    App.readProgress = {};
-    localStorage.setItem('patent200_progress', '{}');
-    showToast('进度已重置');
-  }
-}
-
-// ==================== PANELS ====================
-function openPanel(name) {
-  document.getElementById('panelOverlay').classList.add('active');
-  document.getElementById(`${name}Panel`).classList.add('active');
-
-  if (name === 'bookmarks') renderBookmarks();
-  if (name === 'progress') renderProgress();
-}
-
-function closePanel() {
-  document.getElementById('panelOverlay').classList.remove('active');
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-}
-
-// ==================== SETTINGS ====================
-function toggleDark() {
-  App.darkMode = !App.darkMode;
-  document.documentElement.setAttribute('data-theme', App.darkMode ? 'dark' : 'light');
-  document.getElementById('darkToggle').classList.toggle('active', App.darkMode);
-  localStorage.setItem('patent200_dark', App.darkMode);
-}
-
-function changeFontSize(delta) {
-  App.fontSize = Math.max(12, Math.min(20, App.fontSize + delta));
-  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
-  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
-  localStorage.setItem('patent200_fontsize', App.fontSize);
-  // Update all card bodies
-  document.querySelectorAll('.k-card-body').forEach(el => el.style.fontSize = App.fontSize + 'px');
-}
-
-// ==================== UTILS ====================
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Scroll to top button visibility
-window.addEventListener('scroll', () => {
-  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 300);
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
-    e.preventDefault();
-    if (!App.searchActive) toggleSearch();
-  }
-  if (e.key === 'Escape') {
-    if (App.searchActive) toggleSearch();
-    closePanel();
-  }
-});
-
-// ====== INJECTED DATA ======
+<script>// ====== DATA ======
 const zl200Data = {
   "subject": "专利法",
   "chapters": [
@@ -10855,6 +10423,446 @@ const xg200Data = {
     }
   ]
 };
+// ====== END DATA ======
+
+
+// ==================== APP STATE ====================
+const App = {
+  currentTab: 'patent',
+  data: { patent: null, related: null },
+  bookmarks: JSON.parse(localStorage.getItem('patent200_bookmarks') || '{}'),
+  readProgress: JSON.parse(localStorage.getItem('patent200_progress') || '{}'),
+  fontSize: parseInt(localStorage.getItem('patent200_fontsize') || '14'),
+  darkMode: localStorage.getItem('patent200_dark') !== 'false',
+  searchQuery: '',
+  searchActive: false,
+};
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  if (App.darkMode) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('darkToggle').classList.remove('active');
+  }
+  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
+  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
+  loadData();
+});
+
+// ==================== DATA LOADING ====================
+// ====== DATA ======
+
+// ====== END DATA ======
+
+function loadData() {
+  if (typeof zl200Data !== 'undefined') App.data.patent = zl200Data;
+  if (typeof xg200Data !== 'undefined') App.data.related = xg200Data;
+  if (!App.data.patent && !App.data.related) { showDemo(); return; }
+  renderContent();
+  updateStats();
+  buildTOC();
+}
+
+// ==================== DEMO DATA ====================
+function showDemo() {
+  App.data.patent = {
+    subject: '专利法',
+    chapters: [
+      {
+        title: '一、专利制度概述',
+        points: [
+          { id: '1', title: '专利权的概念', content: '专利权是国家专利行政部门根据法律规定，授予发明创造申请人对其发明创造在一定期限内享有的<span class="key-blue">独占实施权</span>。专利权是一种<span class="key-red">排他性</span>的财产权。', sub_points: ['①专利权具有地域性，仅在授权国有效', '②专利权具有时间性，发明专利20年，实用新型和外观设计10年', '③专利权需要以公开技术方案为代价'] },
+          { id: '2', title: '专利制度的基本原则', content: '专利制度遵循以下基本原则：', sub_points: ['①<span class="key-blue">先申请原则</span>：两个以上申请人分别就同样发明创造申请专利的，专利权授予最先申请的人', '②单一性原则：一件专利申请应当限于一项发明创造', '③优先权原则：申请人在外国第一次提出专利申请之日起12个月内，又在中国就相同主题提出专利申请的，可以享有优先权'] },
+          { id: '3', title: '专利法的客体', content: '专利法保护的客体包括：<span class="key-blue">发明</span>、<span class="key-blue">实用新型</span>和<span class="key-blue">外观设计</span>。其中发明和实用新型需要具备新颖性、创造性和实用性三要件。', tables: [{ headers: ['类型', '保护期限', '审批方式', '创造性要求'], rows: [['发明专利', '20年', '实质审查', '突出的实质性特点和显著的进步'], ['实用新型', '10年', '初步审查', '实质性特点和进步'], ['外观设计', '15年', '初步审查', '与现有设计有明显区别']] }] }
+        ]
+      },
+      {
+        title: '二、专利代理制度',
+        points: [
+          { id: '4', title: '不得报名参加考试的情形', content: '以下人员不得报名参加专利代理师资格考试：', sub_points: ['①因<span class="key-red">故意犯罪</span>受过刑罚，自刑罚执行完毕之日起未满3年', '②受吊销专利代理师资格证的处罚，自处罚决定之日起未满3年'] },
+          { id: '5', title: '专利代理机构的成立条件', content: '专利代理机构名称中应含有"<span class="key-blue">专利代理</span>"或"<span class="key-blue">知识产权代理</span>"等字样。', tables: [{ headers: ['机构类型', '人员要求', '数量要求'], rows: [['合伙企业', '2年以上执业经历的合伙人', '2名以上'], ['有限责任公司', '2年以上执业经历的股东', '5名以上以上'], ['律师事务所', '具有专利代理师资格证的律师', '1名以上']] }] }
+        ]
+      }
+    ]
+  };
+  App.data.related = {
+    subject: '相关法',
+    chapters: [
+      {
+        title: '一、民法典',
+        points: [
+          { id: '1', title: '自然人的民事权利能力', content: '自然人从<span class="key-blue">出生时</span>起到<span class="key-blue">死亡时</span>止，具有民事权利能力，依法享有民事权利，承担民事义务。', sub_points: ['①自然人的出生时间和死亡时间，以出生证明、死亡证明记载的时间为准', '②没有出生证明、死亡证明的，以户籍登记或者其他有效身份登记记载的时间为准'] },
+          { id: '2', title: '宣告失踪', content: '自然人下落不明满<span class="key-red">2年</span>的，利害关系人可以向人民法院申请宣告该自然人为失踪人。', sub_points: ['①失踪人的财产由财产代管人管理', '②财产代管人应当妥善管理失踪人的财产'] }
+        ]
+      }
+    ]
+  };
+  renderContent();
+  updateStats();
+  buildTOC();
+}
+
+// ==================== RENDER ====================
+function renderContent() {
+  const data = App.data[App.currentTab];
+  if (!data) {
+    document.getElementById('contentArea').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">暂无数据</div>
+        <div class="empty-desc">请稍后再试</div>
+      </div>`;
+    return;
+  }
+
+  const container = document.getElementById('contentArea');
+  let html = '';
+
+  data.chapters.forEach((chapter, ci) => {
+    const chapterId = `ch_${ci}`;
+    const isCollapsed = localStorage.getItem(`patent200_col_${App.currentTab}_${ci}`) === 'true';
+
+    html += `<div class="chapter ${isCollapsed ? 'collapsed' : ''}" id="${chapterId}">
+      <div class="chapter-header ${App.searchActive ? 'search-shifted' : ''}" onclick="toggleChapter('${chapterId}', ${ci})">
+        <div class="chapter-title">
+          <span class="chapter-badge">${chapter.points.length}</span>
+          ${chapter.title}
+        </div>
+        <span class="chapter-toggle">▼</span>
+      </div>
+      <div class="chapter-body">`;
+
+    chapter.points.forEach((point, pi) => {
+      const cardId = `${App.currentTab}_${ci}_${pi}`;
+      const isBookmarked = App.bookmarks[cardId];
+      const hasBlue = (point.content || '').includes('key-blue') || (point.sub_points || []).some(s => s.includes('key-blue'));
+      const hasRed = (point.content || '').includes('key-red') || (point.sub_points || []).some(s => s.includes('key-red'));
+
+      // Search filter
+      if (App.searchQuery) {
+        const q = App.searchQuery.toLowerCase();
+        const searchText = `${point.id} ${point.title} ${point.content} ${(point.sub_points||[]).join(' ')}`.toLowerCase();
+        if (!searchText.includes(q)) return;
+      }
+
+      html += `<div class="k-card ${hasBlue ? 'highlight-blue' : ''} ${hasRed ? 'highlight-red' : ''}" id="card_${cardId}">
+        <div class="k-card-header">
+          <span class="k-card-id">${point.id}</span>
+          <span class="k-card-title">${point.title}</span>
+          <div class="k-card-actions">
+            <button class="k-action-btn ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${cardId}', '${point.title}')" title="书签">
+              ${isBookmarked ? '★' : '☆'}
+            </button>
+          </div>
+        </div>
+        <div class="k-card-body" style="font-size:${App.fontSize}px">
+          ${point.content || ''}`;
+
+      if (point.sub_points && point.sub_points.length) {
+        point.sub_points.forEach(sp => {
+          html += `<span class="sub-point">${sp}</span>`;
+        });
+      }
+
+      if (point.tables && point.tables.length) {
+        point.tables.forEach(tbl => {
+          html += `<table class="k-table"><thead><tr>`;
+          tbl.headers.forEach(h => html += `<th>${h}</th>`);
+          html += `</tr></thead><tbody>`;
+          tbl.rows.forEach(row => {
+            html += `<tr>`;
+            row.forEach(cell => html += `<td>${cell}</td>`);
+            html += `</tr>`;
+          });
+          html += `</tbody></table>`;
+        });
+      }
+
+      html += `</div></div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (!html && App.searchQuery) {
+    html = `<div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">未找到匹配结果</div>
+      <div class="empty-desc">试试其他关键词</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ==================== STATS ====================
+function updateStats() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let points = 0, highlights = 0, tables = 0;
+  data.chapters.forEach(ch => {
+    points += ch.points.length;
+    ch.points.forEach(p => {
+      const text = `${p.content || ''} ${(p.sub_points||[]).join(' ')}`;
+      if (text.includes('key-blue') || text.includes('key-red')) highlights++;
+      if (p.tables && p.tables.length) tables += p.tables.length;
+    });
+  });
+
+  document.getElementById('statPoints').textContent = points;
+  document.getElementById('statHighlights').textContent = highlights;
+  document.getElementById('statTables').textContent = tables;
+  document.getElementById('statBookmarks').textContent = Object.keys(App.bookmarks).filter(k => k.startsWith(App.currentTab)).length;
+}
+
+// ==================== TOC ====================
+function buildTOC() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let html = '';
+  data.chapters.forEach((ch, i) => {
+    html += `<div class="toc-item" onclick="scrollToChapter(${i}); closePanel();">
+      <span class="toc-num">${i + 1}</span>
+      <span class="toc-text">${ch.title}</span>
+      <span class="toc-count">${ch.points.length}个</span>
+    </div>`;
+  });
+  document.getElementById('tocBody').innerHTML = html;
+}
+
+// ==================== TAB SWITCHING ====================
+function switchTab(tab) {
+  App.currentTab = tab;
+  App.searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  const titles = { patent: '专利法200', related: '相关法200', bookmarks: '书签', progress: '进度' };
+  document.getElementById('headerTitle').textContent = titles[tab] || '';
+
+  renderContent();
+  updateStats();
+  buildTOC();
+  scrollToTop();
+}
+
+// ==================== SEARCH ====================
+function toggleSearch() {
+  App.searchActive = !App.searchActive;
+  const container = document.getElementById('searchContainer');
+  const main = document.getElementById('mainContent');
+  const statsBar = document.getElementById('statsBar');
+
+  if (App.searchActive) {
+    container.classList.add('active');
+    main.classList.add('search-open');
+    statsBar.classList.add('shifted');
+    document.getElementById('searchInput').focus();
+  } else {
+    container.classList.remove('active');
+    main.classList.remove('search-open');
+    statsBar.classList.remove('shifted');
+    clearSearch();
+  }
+}
+
+function onSearch(value) {
+  App.searchQuery = value.trim();
+  document.getElementById('searchClear').classList.toggle('visible', !!value);
+  renderContent();
+}
+
+function clearSearch() {
+  App.searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  renderContent();
+}
+
+// ==================== CHAPTERS ====================
+function toggleChapter(id, index) {
+  const el = document.getElementById(id);
+  el.classList.toggle('collapsed');
+  localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, el.classList.contains('collapsed'));
+}
+
+function scrollToChapter(index) {
+  const el = document.getElementById(`ch_${index}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el.classList.contains('collapsed')) {
+      el.classList.remove('collapsed');
+      localStorage.setItem(`patent200_col_${App.currentTab}_${index}`, 'false');
+    }
+  }
+}
+
+// ==================== BOOKMARKS ====================
+function toggleBookmark(cardId, title) {
+  if (App.bookmarks[cardId]) {
+    delete App.bookmarks[cardId];
+    showToast('已取消书签');
+  } else {
+    App.bookmarks[cardId] = { title, tab: App.currentTab, time: Date.now() };
+    showToast('已添加书签 ★');
+  }
+  localStorage.setItem('patent200_bookmarks', JSON.stringify(App.bookmarks));
+  renderContent();
+  updateStats();
+}
+
+function clearBookmarks() {
+  if (confirm('确定清除所有书签？')) {
+    App.bookmarks = {};
+    localStorage.setItem('patent200_bookmarks', '{}');
+    renderContent();
+    updateStats();
+    showToast('书签已清除');
+  }
+}
+
+function renderBookmarks() {
+  const entries = Object.entries(App.bookmarks).sort((a, b) => b[1].time - a[1].time);
+  if (!entries.length) {
+    document.getElementById('bookmarksBody').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔖</div>
+        <div class="empty-title">暂无书签</div>
+        <div class="empty-desc">点击知识点卡片的 ☆ 添加书签</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([id, bm]) => {
+    const date = new Date(bm.time).toLocaleDateString('zh-CN');
+    html += `<div class="bookmark-item" onclick="jumpToBookmark('${bm.tab}', '${id}')">
+      <div class="bm-title">${bm.title}</div>
+      <div class="bm-meta">
+        <span>${bm.tab === 'patent' ? '📘 专利法' : '📗 相关法'}</span>
+        <span>${date}</span>
+      </div>
+    </div>`;
+  });
+  document.getElementById('bookmarksBody').innerHTML = html;
+}
+
+function jumpToBookmark(tab, cardId) {
+  closePanel();
+  if (App.currentTab !== tab) switchTab(tab);
+  setTimeout(() => {
+    const el = document.getElementById(`card_${cardId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.boxShadow = '0 0 0 2px var(--accent-blue)';
+      setTimeout(() => el.style.boxShadow = '', 2000);
+    }
+  }, 300);
+}
+
+// ==================== PROGRESS ====================
+function renderProgress() {
+  const data = App.data[App.currentTab];
+  if (!data) return;
+
+  let total = 0, read = 0;
+  data.chapters.forEach((ch, ci) => {
+    ch.points.forEach((p, pi) => {
+      total++;
+      const key = `${App.currentTab}_${ci}_${pi}`;
+      if (App.readProgress[key]) read++;
+    });
+  });
+
+  const pct = total ? Math.round(read / total * 100) : 0;
+  document.getElementById('progressBody').innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;font-weight:900;color:var(--accent-blue);">${pct}%</div>
+      <div style="color:var(--text-secondary);margin:8px 0;">已阅读 ${read} / ${total} 个知识点</div>
+      <div class="progress-bar" style="margin:16px auto;max-width:200px;">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  `;
+}
+
+function clearProgress() {
+  if (confirm('确定重置阅读进度？')) {
+    App.readProgress = {};
+    localStorage.setItem('patent200_progress', '{}');
+    showToast('进度已重置');
+  }
+}
+
+// ==================== PANELS ====================
+function openPanel(name) {
+  document.getElementById('panelOverlay').classList.add('active');
+  document.getElementById(`${name}Panel`).classList.add('active');
+
+  if (name === 'bookmarks') renderBookmarks();
+  if (name === 'progress') renderProgress();
+}
+
+function closePanel() {
+  document.getElementById('panelOverlay').classList.remove('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+}
+
+// ==================== SETTINGS ====================
+function toggleDark() {
+  App.darkMode = !App.darkMode;
+  document.documentElement.setAttribute('data-theme', App.darkMode ? 'dark' : 'light');
+  document.getElementById('darkToggle').classList.toggle('active', App.darkMode);
+  localStorage.setItem('patent200_dark', App.darkMode);
+}
+
+function changeFontSize(delta) {
+  App.fontSize = Math.max(12, Math.min(20, App.fontSize + delta));
+  document.documentElement.style.setProperty('--content-font-size', App.fontSize + 'px');
+  document.getElementById('fontSizeValue').textContent = App.fontSize + 'px';
+  localStorage.setItem('patent200_fontsize', App.fontSize);
+  // Update all card bodies
+  document.querySelectorAll('.k-card-body').forEach(el => el.style.fontSize = App.fontSize + 'px');
+}
+
+// ==================== UTILS ====================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Scroll to top button visibility
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 300);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    if (!App.searchActive) toggleSearch();
+  }
+  if (e.key === 'Escape') {
+    if (App.searchActive) toggleSearch();
+    closePanel();
+  }
+});
+
+// ====== INJECTED DATA ======
+
 // ====== END DATA ======
 </script>
 </body>
